@@ -24,19 +24,36 @@
       s := server.New("/tmp/server.sock", server.DEFAULT_TIMEOUT, handler)
 
 handler - пользовательская функция, в которой обрабатываются сообщения.
+
 Ее сигнатура - func handler(request []byte) (response []byte) 
+
+      func handler(request []byte) (response []byte) {
+      return []byte("Получил запрос")
+      }
 
 Для запуска сервера нужно обратится к s.Listen()
 
       <-s.Listen()
 Еще один пример есть в examples/server/main.go
 
-### Клиент:  
+### Клиент:
+
+## 1-й пример - получаем raw bytes:
+      c, err := client.Connect("/tmp/server.sock", time.Millisecond*200)
+      if err == nil {
+            c.Send([]byte("raw bytes"))
+            if data, ok := c.Receive(); ok{
+                  //проводим любые операции с data - это []byte
+            }
+            
+      }
+
+## 2-й пример - получаем string:
+
       c, err := client.Connect("/tmp/server.sock", time.Millisecond*200)
          if err == nil {
                c.Send([]byte("Hi!")) //послали строку
-               data, ok := c.Receive()
-               if ok {
+               if data, ok := c.Receive(); ok{
                   var buffer bytes.Buffer = *bytes.NewBuffer(data)
                   fmt.Println(buffer.String()) //ответ от сервера - в данном случае строка
                }
