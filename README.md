@@ -23,9 +23,11 @@
 
       s := server.New("/tmp/server.sock", server.DEFAULT_TIMEOUT, handler)
 
-handler - пользовательская функция, в которой обрабатываются сообщения.
+**handler** - пользовательская функция, в которой обрабатываются сообщения.
 
 Ее сигнатура - func handler(request []byte) (response []byte) 
+
+Эту функцию должен определить пользователь библиотеки. Пример ниже:
 
       func handler(request []byte) (response []byte) {
       return []byte("Получил запрос")
