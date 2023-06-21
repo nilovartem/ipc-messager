@@ -9,6 +9,10 @@ import (
 	"github.com/nilovartem/ipc-messager/pkg/client"
 )
 
+/*
+This example shows that the server is capable of reading and transmitting
+information to multiple clients at the same time (in this case doubled numbers)
+*/
 func main() {
 	const numJobs = 5
 	jobs := make(chan int, numJobs)
@@ -29,7 +33,7 @@ func main() {
 
 }
 func worker(id int, jobs <-chan int, results chan<- int) {
-	c, err := client.Connect("/tmp/server.sock", time.Millisecond*200)
+	c, err := client.Connect("/tmp/server.sock", time.Millisecond*200) //optional timeout, or constant
 	if err == nil {
 		for j := range jobs {
 			fmt.Println("worker", id, "started  job", j)
@@ -43,7 +47,5 @@ func worker(id int, jobs <-chan int, results chan<- int) {
 				results <- result
 			}
 		}
-
 	}
-
 }

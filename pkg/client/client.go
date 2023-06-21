@@ -100,6 +100,8 @@ func (c *Client) Receive() ([]byte, bool) {
 	return m.Content, true
 
 }
+
+// Connect establish connection to server within timeout
 func Connect(server string, timeout time.Duration) (Client, error) {
 	c := Client{
 		Certificate: auth.Current(),
@@ -124,6 +126,8 @@ func Connect(server string, timeout time.Duration) (Client, error) {
 		}
 	}
 }
+
+// Disconnect closes connection with server
 func (c *Client) Disconnect() {
 	if c.connection != nil {
 		c.connection.Close()
