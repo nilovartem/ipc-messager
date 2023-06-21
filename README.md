@@ -1,5 +1,6 @@
 # ipc-messager
 Библиотека для обмена сообщениями между сервисами через UDS(unix domain sockets).
+https://pkg.go.dev/github.com/nilovartem/ipc-messager#section-readme
 ## Описание
 Библиотека предоставляет пакеты клиента и сервера.
 
