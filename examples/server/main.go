@@ -3,37 +3,35 @@ package main
 import (
 	"bytes"
 	"fmt"
+	"strconv"
+	"time"
 
-	"github.com/nilovartem/ipc-messager/pkg/client"
 	"github.com/nilovartem/ipc-messager/pkg/server"
 )
 
-func main() {
-	s := server.New("/tmp/server.sock")
-	line, err := s.Listen()
-	if err == nil {
-		for c := range line {
-			//чекаю клиента, если понравился - принимаю
-			s.Accept(c)
-			go func (){
-				answer := c.Read()
-				if answer == lalal
-				c.Send(;,g;,;dlfg;lfd)
-			}()
-			/*
-			go func(cl client.Client) {
-				fmt.Println("go func server.client")
-				for {
-					var buffer bytes.Buffer
-					buffer.ReadFrom(*cl.Connection)
-					if buffer.Len() != 0 {
-						fmt.Println(buffer.String())
-						fmt.Println(buffer.Len())
-					}
+// custom function for message handling
+func handler(request []byte) (response []byte) {
+	var buffer bytes.Buffer = *bytes.NewBuffer(request)
+	fmt.Println("Это запрос: ", buffer.String())
+	value, _ := strconv.Atoi(buffer.String())
+	value *= 2
+	return []byte(strconv.Itoa(value))
 
-				}
-			}(c)
-*/
+}
+
+// main shows the next example: server running for 10s, than closes
+func main() {
+	s := server.New("/tmp/server.sock", server.DEFAULT_TIMEOUT, handler)
+	timer := time.NewTimer(time.Second * 10)
+	select {
+	case <-timer.C:
+		{
+			fmt.Println("Таймер истек")
+			s.Close()
+		}
+	case <-s.Listen():
+		{
+
 		}
 	}
 }
