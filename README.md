@@ -41,7 +41,7 @@ handler - пользовательская функция, в которой о�
 
 ### Клиент:
 
-## 1-й пример - получаем raw bytes:
+#### 1-й пример - получаем raw bytes:
       c, err := client.Connect("/tmp/server.sock", time.Millisecond*200)
       if err == nil {
             c.Send([]byte("raw bytes"))
@@ -51,7 +51,7 @@ handler - пользовательская функция, в которой о�
             
       }
 
-## 2-й пример - получаем string:
+#### 2-й пример - получаем string:
 
       c, err := client.Connect("/tmp/server.sock", time.Millisecond*200)
          if err == nil {
