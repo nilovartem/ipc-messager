@@ -1,7 +1,6 @@
 package auth
 
 import (
-	"fmt"
 	"os"
 	"os/user"
 	"strconv"
@@ -13,16 +12,18 @@ type Data struct {
 	GID
 }
 
-func Current() Data { //вернуть еще и ошибку
-	//fmt.Println(os.ExpandEnv("$USER"))
+// Current get's auth data for client and server
+func Current() Data {
 	u, err := user.Lookup(os.ExpandEnv("$USER"))
 	if err != nil {
-		fmt.Printf("AUTH.CURRENT: %s", err)
+		data := Data{}
+		data.PID = (PID)(0)
+		data.UID = (UID)(0)
+		data.GID = (GID)(0)
+		return data
 	}
 	data := Data{}
 	data.PID = (PID)(os.Getpid())
-	//	fmt.Println("uid", u.Uid)
-	//	fmt.Println("uname", u.Name)
 	data.UID = (UID)(u.Uid)
 	data.GID = (GID)(u.Gid)
 	return data
