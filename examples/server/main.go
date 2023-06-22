@@ -29,9 +29,9 @@ func main() {
 			fmt.Println("Таймер истек")
 			s.Close()
 		}
-	case <-s.Listen():
+	case err := <-s.Listen():
 		{
-
+			fmt.Println("Возникла ошибка:", err)
 		}
 	}
 }
