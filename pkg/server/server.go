@@ -90,14 +90,22 @@ func (s *server) lookup(pid auth.PID) (ok bool) {
 	return
 }
 
+// addClient adds client to clients map
+func (s *server) addClient(m client.Message) {
+	(*s.mutex).Lock()
+	s.clients[m.Author.Certificate.PID] = m.Author
+	(*s.mutex).Unlock()
+}
+
 // Receive reads bytes from connection
-func (s *server) Receive(c net.Conn) (int, []byte) {
+func (s *server) Receive(c net.Conn) (bool, []byte) {
 	c.SetReadDeadline(time.Now().Add(s.timeout)) //100ms на чтение
-	var b []byte
 	var inc bytes.Buffer
 	inc.ReadFrom(c)
-	b = inc.Bytes()
-	return inc.Len(), b
+	if inc.Len() == 0 {
+		return false, inc.Bytes()
+	}
+	return true, inc.Bytes()
 }
 
 // Send sends bytes to connection
@@ -110,31 +118,23 @@ func (s *server) Send(c net.Conn, data []byte) {
 // handle controls steps of converting the received data to messages and vice versa
 func (s *server) handle(c net.Conn) {
 	for {
-		if length, b := s.Receive(c); length != 0 {
+		if ok, b := s.Receive(c); ok {
 			m := client.Message{}
-			if err := m.Unmarshall(b); err == nil {
-				if !s.lookup(m.Author.Certificate.PID) {
-					(*s.mutex).Lock()
-					s.clients[m.Author.Certificate.PID] = m.Author
-					(*s.mutex).Unlock()
-				}
-				if m.Author.Accepted {
-					response := s.handler(m.Content)
-					var buffer bytes.Buffer = *bytes.NewBuffer(response)
-					if buffer.Len() != 0 {
-						err := m.CreateMessage(response)
-						if err != nil {
-							s.errors <- err
-						}
-						response, err = m.Marshall()
-						if err != nil {
-							s.errors <- err
-						}
-						s.Send(c, response)
-					}
-				}
-			} else {
+			err := m.Unmarshall(b)
+			if err != nil {
 				s.errors <- err
+			}
+			if !s.lookup(m.Author.Certificate.PID) {
+				s.addClient(m)
+			}
+			if m.Author.Accepted {
+				response := s.handler(m.Content)
+				m.CreateMessage(response)
+				response, err = m.Marshall()
+				if err != nil {
+					s.errors <- err
+				}
+				s.Send(c, response)
 			}
 		}
 
@@ -157,7 +157,6 @@ func (s *server) Listen() <-chan error {
 func (s *server) Close() {
 	s.close()
 	s.cleanup()
-
 }
 
 // cleanup closes server and all connections

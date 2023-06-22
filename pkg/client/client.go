@@ -22,7 +22,7 @@ type Message struct {
 }
 
 // Method CreateMessage creates new Message and implementing IMessage
-func (m *Message) CreateMessage(data []byte) error {
+func (m *Message) CreateMessage(data []byte) {
 	c := Client{
 		Certificate: auth.Current(), //подставляем данные сервера
 		Accepted:    true,
@@ -30,7 +30,6 @@ func (m *Message) CreateMessage(data []byte) error {
 	}
 	m.Author = c
 	m.Content = data
-	return nil
 }
 
 // Method Marshall encodes Message to byte array
